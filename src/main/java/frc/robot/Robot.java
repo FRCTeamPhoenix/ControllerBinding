@@ -28,7 +28,6 @@ public class Robot extends IterativeRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  MecanumDrivetrain drive;
   Joystick stick;
   WPI_TalonSRX talonFR;
   WPI_TalonSRX talonFL;
