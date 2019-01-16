@@ -6,44 +6,27 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 
 public class InputManager{
     private Map<String, String> m_axes;
 
     public InputManager(){
-        
-        Scanner controlChoice = new Scanner(System.in);
-        System.out.println("Enter the Function: ");
-        String controlFunction = controlChoice.nextString();
-        String controlAssign = new Scanner(System.in);
-        System.out.println("Enter the Binding: ");
-        String controlBind = controlAssign.nextString();
-        reader.close();
 
-        m_axes.put(controlFunction, controlBind);
+        m_axes.put("Move Forward", "Axis 1");
     }
 
     public double getValue(String axisName){
 
         this.stick = new Joystick(0);
 
-        String test = m_axes.indexOf(controlBind);
+        String test = m_axes.indexOf(axisName);
         String[] tokens = test.split(" ");
 
-        for(String t : tokens) {
-            if(t = "Axis") {
-
-            }
-            else if(t = "Button") {
-
-            }
-            else {
-                System.out.println("Invalid Control Binding");
-            }
+        if(tokens[0] = "Axis") {
+            int axisNumber = Integer.parseInt(tokens[1]);
         }
-
-        return 1.0;
+        
+        return 0.0;
     }
 
     public void loadFromFile(String fileName){
