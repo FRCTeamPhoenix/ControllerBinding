@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends IterativeRobot {
+  private InputManagerJson inputManagerJson = new InputManagerJson();
+  private InputManager inputManager = new InputManager();
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
@@ -35,6 +37,7 @@ public class Robot extends IterativeRobot {
   WPI_TalonSRX talonBL;
 
   public Robot() {
+
     // this.drive = new MecanumDrivetrain(1, 2, 3, 4);
     talonBL = new WPI_TalonSRX(1);
     talonBR = new WPI_TalonSRX(2);
@@ -49,7 +52,7 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void robotInit() {
-    SmartDashboard.putData("Auto choices", m_chooser);
+    //SmartDashboard.putString("Test String: ", inputManagerJson.getAxisMap("controllerconfig.json", "default").get("Move Forward"));
   }
 
   /**
@@ -114,6 +117,10 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void teleopPeriodic() {
+    SmartDashboard.putString("DB/String 0", ""+inputManager.getValue("Move Forward"));
+    SmartDashboard.putString("DB/String 1", ""+inputManager.getValue("TestButton"));
+    SmartDashboard.putString("DB/String 2", ""+stick.getRawAxis(1));
+    SmartDashboard.putString("DB/String 3", stick.getRawButton(1) ? "1.0" : "0.0");
     // drive.drive(stick);
     double inX = stick.getRawAxis(0);
     double inY = -stick.getRawAxis(1);
@@ -129,14 +136,14 @@ public class Robot extends IterativeRobot {
     talonFR.set(ControlMode.PercentOutput,  -0.5);
     talonBL.set(ControlMode.PercentOutput,  0.5);*/
 
-    SmartDashboard.putString("DB/String 0", ""+(inX + inY + rotation) / 4.0);
+    /*SmartDashboard.putString("DB/String 0", ""+(inX + inY + rotation) / 4.0);
     SmartDashboard.putString("DB/String 1", ""+ -(inX + inY - rotation) / 4.0);
     SmartDashboard.putString("DB/String 2", ""+ -(inY - inX - rotation) / 4.0);
     SmartDashboard.putString("DB/String 3", ""+(inY - inX + rotation) / 4.0);
 
     SmartDashboard.putString("DB/String 5", ""+inX);
     SmartDashboard.putString("DB/String 6", ""+inY);
-    SmartDashboard.putString("DB/String 7", ""+rotation);
+    SmartDashboard.putString("DB/String 7", ""+rotation);*/
     // talonFR.set(ControlMode.PercentOutput, stick.getRawAxis(4));
   }
 
