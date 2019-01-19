@@ -52,7 +52,8 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void robotInit() {
-    //SmartDashboard.putString("Test String: ", inputManagerJson.getAxisMap("controllerconfig.json", "default").get("Move Forward"));
+    inputManager.loadFromFile(Filesystem.getDeployDirectory().toString()+"/controllerconfig.json");
+    inputManager.useConfig("default");
   }
 
   /**
@@ -66,6 +67,7 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void robotPeriodic() {
+    inputManager.refreshDashboard();
   }
 
   /**
@@ -106,9 +108,6 @@ public class Robot extends IterativeRobot {
 
   @Override
   public void teleopInit() {
-    inputManager.loadFromFile(Filesystem.getDeployDirectory().toString()+"/controllerconfig.json");
-    SmartDashboard.putString("DB/String 4",""+Filesystem.getDeployDirectory().toString()+"/controllerconfig.json");
-    inputManager.useConfig("default");
     talonFL.setSelectedSensorPosition(0);
     talonFR.setSelectedSensorPosition(0);
     talonBR.setSelectedSensorPosition(0);
@@ -122,12 +121,10 @@ public class Robot extends IterativeRobot {
   public void teleopPeriodic() {
     SmartDashboard.putString("DB/String 0", ""+inputManager.getValue("Move Forward"));
     //SmartDashboard.putString("DB/String 1", ""+inputManager.getValue("TestButton"));
-    SmartDashboard.putString("DB/String 2", ""+stick.getRawAxis(1));
-    SmartDashboard.putString("DB/String 3", stick.getRawButton(1) ? "1.0" : "0.0");
     // drive.drive(stick);
-    double inX = stick.getRawAxis(0);
-    double inY = -stick.getRawAxis(1);
-    double rotation = -stick.getRawAxis(4);
+    double inX = inputManager.getValue("Move Horizontal");
+    double inY = -inputManager.getValue("Move Forward");
+    double rotation = -inputManager.getValue("Rotate");
 
     double speedDenominator = 1.0;
     talonFL.set(ControlMode.PercentOutput,  -(inX + inY + rotation) / speedDenominator);

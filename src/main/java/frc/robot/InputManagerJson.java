@@ -13,7 +13,7 @@ public class InputManagerJson{
         
     }
 
-    Map<String,String> getAxisMap(String file, String config){
+   public Map<String,String> getAxisMap(String file, String config){
         Map<String, String> axes = new HashMap<String, String>();
         try{
             String content = new String(Files.readAllBytes(Paths.get(file)));
@@ -25,8 +25,6 @@ public class InputManagerJson{
             } catch (JsonParserException e) {
                 System.out.println("Falied to find root in json file");
             }
-            
-            System.out.println("Found root!");
 
             //get the specific config
             JsonObject jsonConfig = root.getObject(config);
@@ -47,5 +45,9 @@ public class InputManagerJson{
         };
 
         return axes;
+    }
+
+    public void updateConfig(String configName, String file, Map<String,String> values){
+        
     }
 }

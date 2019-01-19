@@ -1,5 +1,12 @@
 {
     "default":{
-        "Move Forward":"Axis 1"
+        "Move Forward":"Axis 1 0",
+        "Move Horizontal":"Axis 0 0",
+        "Rotate":"Axis 4 0"
+    },
+    "inverted":{
+        "Move Forward":"Axis 5 0",
+        "Move Horizontal":"Axis 4 0",
+        "Rotate":"Axis 0 0"
     }
 }
