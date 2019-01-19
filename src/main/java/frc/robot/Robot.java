@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends IterativeRobot {
-  private InputManagerJson inputManagerJson = new InputManagerJson();
   private InputManager inputManager = new InputManager();
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
@@ -106,6 +106,9 @@ public class Robot extends IterativeRobot {
 
   @Override
   public void teleopInit() {
+    inputManager.loadFromFile(Filesystem.getDeployDirectory().toString()+"/controllerconfig.json");
+    SmartDashboard.putString("DB/String 4",""+Filesystem.getDeployDirectory().toString()+"/controllerconfig.json");
+    inputManager.useConfig("default");
     talonFL.setSelectedSensorPosition(0);
     talonFR.setSelectedSensorPosition(0);
     talonBR.setSelectedSensorPosition(0);
@@ -118,7 +121,7 @@ public class Robot extends IterativeRobot {
   @Override
   public void teleopPeriodic() {
     SmartDashboard.putString("DB/String 0", ""+inputManager.getValue("Move Forward"));
-    SmartDashboard.putString("DB/String 1", ""+inputManager.getValue("TestButton"));
+    //SmartDashboard.putString("DB/String 1", ""+inputManager.getValue("TestButton"));
     SmartDashboard.putString("DB/String 2", ""+stick.getRawAxis(1));
     SmartDashboard.putString("DB/String 3", stick.getRawButton(1) ? "1.0" : "0.0");
     // drive.drive(stick);
