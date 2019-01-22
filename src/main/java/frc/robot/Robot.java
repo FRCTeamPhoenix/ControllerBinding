@@ -119,7 +119,6 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putString("DB/String 0", ""+inputManager.getValue("Move Forward"));
     //SmartDashboard.putString("DB/String 1", ""+inputManager.getValue("TestButton"));
     // drive.drive(stick);
     double inX = inputManager.getValue("Move Horizontal");

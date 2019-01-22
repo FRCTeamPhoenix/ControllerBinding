@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -13,10 +17,23 @@ public class InputManager{
     private String m_fileName = "";
     private String m_lastAxis = "";
     private boolean m_buttonPreviouslyDown = false;
+    private String m_inputNumber = "";
+    private String m_gamepadNumber = "";
 
     public InputManager(){
         SmartDashboard.putString("Errors", "Axis rebinding disabled");
         SmartDashboard.putString("Config Name","default");
+
+        //add listeners for updates
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("SmartDashboard");
+        table.getEntry("Input #").addListener(event -> {
+            m_inputNumber = event.value.getString();
+        }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+        
+
+        table.getEntry("Gamepad #").addListener(event -> {
+            m_gamepadNumber = event.value.getString();
+        }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     }
 
     public double getValue(String axisName){
@@ -47,38 +64,57 @@ public class InputManager{
 
     //call every iteration to enable dashboard input
     public void refreshDashboard(){
-        if(validateDashboard()){
+        if(validateAxisName()){
             String axisName = SmartDashboard.getString("Axis Name", "");
             if(!axisName.equals(m_lastAxis)){
                 String[] tokens = m_axes.get(axisName).split(" ");
-                SmartDashboard.putString("Set Input", tokens[0]);
+                SmartDashboard.putString("Select Type", tokens[0]);
                 SmartDashboard.putString("Input #", tokens[1]);
                 SmartDashboard.putString("Gamepad #", tokens[2]);
-            }else{
-                String axisType = SmartDashboard.getString("Input Type","");
-
-                String inputNumber = SmartDashboard.getString("Input #", "");
-                String gamepadNumber = SmartDashboard.getString("Gamepad #","");
-            
-                m_axes.put(axisName, axisType + " "+inputNumber+" "+gamepadNumber);
             }
             m_lastAxis = axisName;
+            if(validateDashboard()){
+                String axisType = SmartDashboard.getString("Input Type","");
 
-            if(SmartDashboard.getBoolean("Save",false)){
-                if(!m_buttonPreviouslyDown){
-                    m_buttonPreviouslyDown = true;
+                //System.out.println("Input #"+SmartDashboard.getString("Input #", ""));
+                m_axes.put(axisName, axisType + " "+m_inputNumber+" "+m_gamepadNumber);
+                SmartDashboard.putString("DB/String 0", axisType + " "+m_inputNumber+" "+m_gamepadNumber);
+                SmartDashboard.putString("DB/String 1", m_axes.get(axisName));
+
+                if(SmartDashboard.getBoolean("Save",false)){
+                    if(!m_buttonPreviouslyDown){
+                        m_buttonPreviouslyDown = true;
+                        m_jsonInput.updateConfig(SmartDashboard.getString("Config Name", ""), m_fileName, m_axes);
+                    }
+                }else if(SmartDashboard.getBoolean("Load", false)){
+                    if(!m_buttonPreviouslyDown){
+                        m_buttonPreviouslyDown = true;
+                        System.out.println("Loading");
+                        useConfig(SmartDashboard.getString("Config Name", ""));
+                        
+                        //force reload
+                        m_lastAxis = "";
+                    }
+                }else{
+                    m_buttonPreviouslyDown = false;
                 }
-            }else if(SmartDashboard.getBoolean("Load", false)){
-                if(!m_buttonPreviouslyDown){
-                    m_buttonPreviouslyDown = true;
-                    useConfig(SmartDashboard.getString("Config Name", ""));
-                    
-                    //force reload
-                    m_lastAxis = "";
-                }
-            }else{
-                m_buttonPreviouslyDown = false;
             }
+        }
+    }
+
+    private boolean validateAxisName(){
+        String axisName = SmartDashboard.getString("Axis Name", "");
+        if(!axisName.equals("")){
+            if(m_axes.get(axisName) == null){
+                SmartDashboard.putString("Errors","Axis "+axisName+" not found!");
+                return false;
+            }
+            
+            return true;
+
+        }else{
+            SmartDashboard.putString("Errors", "No axis selected!");
+            return false;
         }
     }
 
@@ -96,22 +132,19 @@ public class InputManager{
                 SmartDashboard.putString("Errors", "Incorrect axis type "+axisType+"!");
                 return false;
             }
-
-            //verify both values are numbers
-            String inputNumber = SmartDashboard.getString("Input #", "");
-            String gamepadNumber = SmartDashboard.getString("Gamepad #","");
             
+
             try{
-                Integer.parseInt(inputNumber);
+                Integer.parseInt(m_inputNumber);
             }catch(Exception e){
-                SmartDashboard.putString("Errors",inputNumber+" is not a number!");
+                SmartDashboard.putString("Errors",m_inputNumber+" is not a number!");
                 return false;
             }
 
             try{
-                Integer.parseInt(gamepadNumber);
+                Integer.parseInt(m_gamepadNumber);
             }catch(Exception e){
-                SmartDashboard.putString("Errors",gamepadNumber+" is not a number!");
+                SmartDashboard.putString("Errors",m_gamepadNumber+" is not a number!");
                 return false;
             }
 
@@ -127,10 +160,6 @@ public class InputManager{
         m_fileName = fileName;
         
         
-    }
-
-    public void saveAs(String fileName){
-
     }
 
     public void useConfig(String name){
